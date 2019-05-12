@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace SaaSOvation.Common.Domain.Model.LongRunningProcess
 {
-    using System;
-
     public class ProcessTimedOut : IDomainEvent
     {
         public ProcessTimedOut(
-                string tenantId,
-                ProcessId processId,
-                int totalRetriesPermitted,
-                int retryCount)
+            string tenantId,
+            ProcessId processId,
+            int totalRetriesPermitted,
+            int retryCount)
         {
-            this.EventVersion = 1;
-            this.OccurredOn = DateTime.Now;
-            this.ProcessId = processId;
-            this.RetryCount = retryCount;
-            this.TenantId = tenantId;
-            this.TotalRetriesPermitted = totalRetriesPermitted;
+            EventVersion = 1;
+            OccurredOn = DateTime.Now;
+            ProcessId = processId;
+            RetryCount = retryCount;
+            TenantId = tenantId;
+            TotalRetriesPermitted = totalRetriesPermitted;
         }
+
+        public ProcessId ProcessId { get; }
+        public int RetryCount { get; }
+        public string TenantId { get; }
+        public int TotalRetriesPermitted { get; }
 
         public int EventVersion { get; set; }
         public DateTime OccurredOn { get; set; }
-        public ProcessId ProcessId { get; private set; }
-        public int RetryCount { get; private set; }
-        public string TenantId { get; private set; }
-        public int TotalRetriesPermitted { get; private set; }
     }
 }

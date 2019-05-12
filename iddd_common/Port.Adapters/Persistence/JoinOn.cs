@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Data;
+﻿using System.Data;
 
 namespace SaaSOvation.Common.Port.Adapters.Persistence
 {
     public class JoinOn
     {
+        private object currentLeftQualifier;
+        private readonly string leftKey;
+        private readonly string rightKey;
+
         public JoinOn()
         {
         }
@@ -17,28 +18,15 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
             this.rightKey = rightKey;
         }
 
-        object currentLeftQualifier;
-        string leftKey;
-        string rightKey;
-
-        public bool IsSpecified
-        {
-            get
-            {
-                return this.leftKey != null && this.rightKey != null;
-            }
-        }
+        public bool IsSpecified => leftKey != null && rightKey != null;
 
         public bool HasCurrentLeftQualifier(IDataReader dataReader)
         {
             try
             {
-                var columnValue = dataReader.GetValue(dataReader.GetOrdinal(this.leftKey));
-                if (columnValue == null)
-                {
-                    return false;
-                }
-                return columnValue.Equals(this.currentLeftQualifier);
+                var columnValue = dataReader.GetValue(dataReader.GetOrdinal(leftKey));
+                if (columnValue == null) return false;
+                return columnValue.Equals(currentLeftQualifier);
             }
             catch
             {
@@ -52,25 +40,23 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
             var rightColumn = default(object);
             try
             {
-                if (this.IsSpecified)
+                if (IsSpecified)
                 {
-                    leftColumn = dataReader.GetValue(dataReader.GetOrdinal(this.leftKey));
-                    rightColumn = dataReader.GetValue(dataReader.GetOrdinal(this.rightKey));
+                    leftColumn = dataReader.GetValue(dataReader.GetOrdinal(leftKey));
+                    rightColumn = dataReader.GetValue(dataReader.GetOrdinal(rightKey));
                 }
             }
             catch
             {
                 // ignore
             }
+
             return leftColumn != null && rightColumn != null;
         }
 
         public void SaveCurrentLeftQualifier(string columnName, object columnValue)
         {
-            if (columnName.Equals(this.leftKey))
-            {
-                this.currentLeftQualifier = columnValue;
-            }
+            if (columnName.Equals(leftKey)) currentLeftQualifier = columnValue;
         }
     }
 }

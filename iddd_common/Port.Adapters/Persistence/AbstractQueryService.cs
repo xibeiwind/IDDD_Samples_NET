@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace SaaSOvation.Common.Port.Adapters.Persistence
 {
     /// <summary>
-    /// TODO: consider refactoring away from abstract class in favor of composition
+    ///     TODO: consider refactoring away from abstract class in favor of composition
     /// </summary>
     public abstract class AbstractQueryService
     {
+        private readonly string connectionString;
+
+        private readonly DbProviderFactory providerFactory;
+
         public AbstractQueryService(string connectionString, string providerName)
         {
-            this.providerFactory = DbProviderFactories.GetFactory(providerName);
+            providerFactory = DbProviderFactories.GetFactory(providerName);
             this.connectionString = connectionString;
         }
-
-        readonly DbProviderFactory providerFactory;
-        readonly string connectionString;
 
         protected T QueryObject<T>(string query, JoinOn joinOn, params object[] arguments)
         {
@@ -29,13 +26,8 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
             using (var dataReader = selectStatement.ExecuteReader())
             {
                 if (dataReader.Read())
-                {
                     return new ResultSetObjectMapper<T>(dataReader, joinOn).MapResultToType();
-                }
-                else
-                {
-                    return default(T);
-                }
+                return default;
             }
         }
 
@@ -51,6 +43,7 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
                     var obj = new ResultSetObjectMapper<T>(dataReader, joinOn).MapResultToType();
                     objects.Add(obj);
                 }
+
                 return objects;
             }
         }
@@ -62,17 +55,12 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
             using (var dataReader = selectStatement.ExecuteReader())
             {
                 if (dataReader.Read())
-                {
                     return dataReader.GetString(0);
-                }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
 
-        DbCommand CreateCommand(DbConnection conn, string query, object[] args)
+        private DbCommand CreateCommand(DbConnection conn, string query, object[] args)
         {
             var command = conn.CreateCommand();
             command.CommandType = CommandType.Text;
@@ -86,16 +74,16 @@ namespace SaaSOvation.Common.Port.Adapters.Persistence
                 var parameter = command.CreateParameter();
                 parameter.Value = argument;
 
-                command.Parameters.Add(parameter);                
+                command.Parameters.Add(parameter);
             }
 
             return command;
         }
 
-        DbConnection CreateOpenConnection()
+        private DbConnection CreateOpenConnection()
         {
-            var conn = this.providerFactory.CreateConnection();
-            conn.ConnectionString = this.connectionString;
+            var conn = providerFactory.CreateConnection();
+            conn.ConnectionString = connectionString;
             conn.Open();
             return conn;
         }

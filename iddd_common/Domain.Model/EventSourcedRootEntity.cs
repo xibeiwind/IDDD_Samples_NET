@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SaaSOvation.Common.Domain.Model
 {
     public abstract class EventSourcedRootEntity : EntityWithCompositeId
     {
+        private readonly List<IDomainEvent> mutatingEvents;
+
         public EventSourcedRootEntity()
         {
-            this.mutatingEvents = new List<IDomainEvent>();
+            mutatingEvents = new List<IDomainEvent>();
         }
 
         public EventSourcedRootEntity(IEnumerable<IDomainEvent> eventStream, int streamVersion)
@@ -17,35 +16,26 @@ namespace SaaSOvation.Common.Domain.Model
         {
             foreach (var e in eventStream)
                 When(e);
-            this.unmutatedVersion = streamVersion;
+            UnmutatedVersion = streamVersion;
         }
 
-        readonly List<IDomainEvent> mutatingEvents;
-        readonly int unmutatedVersion;
+        protected int MutatedVersion => UnmutatedVersion + 1;
 
-        protected int MutatedVersion
-        {
-            get { return this.unmutatedVersion + 1; }
-        }
-
-        protected int UnmutatedVersion
-        {
-            get { return this.unmutatedVersion; }
-        }
+        protected int UnmutatedVersion { get; }
 
         public IList<IDomainEvent> GetMutatingEvents()
         {
-            return this.mutatingEvents.ToArray();
+            return mutatingEvents.ToArray();
         }
 
-        void When(IDomainEvent e)
+        private void When(IDomainEvent e)
         {
             (this as dynamic).Apply(e);
         }
 
         protected void Apply(IDomainEvent e)
         {
-            this.mutatingEvents.Add(e);
+            mutatingEvents.Add(e);
             When(e);
         }
     }

@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace SaaSOvation.Common.Domain.Model.LongRunningProcess
 {
-    using System;
-
     public class ProcessId : Identity
     {
+        public ProcessId(string id)
+            : base(id)
+        {
+        }
+
+        public ProcessId()
+        {
+        }
+
         public static ProcessId ExistingProcessId(string id)
         {
             return new ProcessId(id);
@@ -26,16 +35,6 @@ namespace SaaSOvation.Common.Domain.Model.LongRunningProcess
         public static ProcessId NewProcessId()
         {
             return new ProcessId(Guid.NewGuid().ToString());
-        }
-
-        public ProcessId(string id)
-            : base(id)
-        {
-        }
-
-        public ProcessId()
-            : base()
-        {
         }
     }
 }

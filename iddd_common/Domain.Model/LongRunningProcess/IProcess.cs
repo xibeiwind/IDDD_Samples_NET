@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace SaaSOvation.Common.Domain.Model.LongRunningProcess
 {
-    using System;
-
     public interface IProcess
     {
         long AllowableDuration();
@@ -49,12 +49,5 @@ namespace SaaSOvation.Common.Domain.Model.LongRunningProcess
         long TotalAllowableDuration();
 
         int TotalRetriesPermitted();
-    }
-
-    public enum ProcessCompletionType
-    {
-        NotCompleted,
-        CompletedNormally,
-        TimedOut
     }
 }

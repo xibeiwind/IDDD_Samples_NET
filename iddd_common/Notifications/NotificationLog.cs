@@ -1,82 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 
 namespace SaaSOvation.Common.Notifications
 {
     public class NotificationLog
     {
-        public NotificationLog(string notificationLogId, string nextNotificationLogId, string previousNotificationLogId, 
+        public NotificationLog(string notificationLogId, string nextNotificationLogId, string previousNotificationLogId,
             IEnumerable<Notification> notifications, bool isArchived)
-        {            
-            this.notificationLogId = notificationLogId;
-            this.nextNotificationLogId = nextNotificationLogId;
-            this.previousNotificationLogId = previousNotificationLogId;
-            this.notifications = new ReadOnlyCollection<Notification>(notifications.ToArray());
-            this.isArchived = isArchived;
-        }
-
-        readonly string notificationLogId;
-        readonly string nextNotificationLogId;
-        readonly string previousNotificationLogId;
-        readonly ReadOnlyCollection<Notification> notifications; 
-        readonly bool isArchived;
-
-        public bool IsArchived
         {
-            get { return this.isArchived; }
+            NotificationLogId = notificationLogId;
+            NextNotificationLogId = nextNotificationLogId;
+            PreviousNotificationLogId = previousNotificationLogId;
+            Notifications = new ReadOnlyCollection<Notification>(notifications.ToArray());
+            IsArchived = isArchived;
         }
 
-        public ReadOnlyCollection<Notification> Notifications
-        {
-            get { return this.notifications; }
-        }
+        public bool IsArchived { get; }
 
-        public int TotalNotifications
-        {
-            get { return this.notifications.Count; }
-        }
+        public ReadOnlyCollection<Notification> Notifications { get; }
 
-        public NotificationLogId DecodedNotificationLogId
-        {
-            get { return new NotificationLogId(this.notificationLogId); }
-        }
+        public int TotalNotifications => Notifications.Count;
 
-        public string NotificationLogId
-        {
-            get { return this.notificationLogId; }
-        }
+        public NotificationLogId DecodedNotificationLogId => new NotificationLogId(NotificationLogId);
 
-        public NotificationLogId DecodedNextNotificationLogId
-        {
-            get { return new NotificationLogId(this.nextNotificationLogId); }
-        }
+        public string NotificationLogId { get; }
 
-        public string NextNotificationLogId
-        {
-            get { return this.nextNotificationLogId; }
-        }
+        public NotificationLogId DecodedNextNotificationLogId => new NotificationLogId(NextNotificationLogId);
 
-        public bool HasNextNotificationLog
-        {
-            get { return this.nextNotificationLogId != null; }
-        }
+        public string NextNotificationLogId { get; }
 
-        public NotificationLogId DecodedPreviousNotificationLogId
-        {
-            get { return new NotificationLogId(this.previousNotificationLogId); }
-        }
+        public bool HasNextNotificationLog => NextNotificationLogId != null;
 
-        public string PreviousNotificationLogId
-        {
-            get { return this.previousNotificationLogId; }
-        }
+        public NotificationLogId DecodedPreviousNotificationLogId => new NotificationLogId(PreviousNotificationLogId);
 
-        public bool HasPreviousNotificationLog
-        {
-            get { return this.previousNotificationLogId != null; }
-        }
+        public string PreviousNotificationLogId { get; }
+
+        public bool HasPreviousNotificationLog => PreviousNotificationLogId != null;
     }
 }

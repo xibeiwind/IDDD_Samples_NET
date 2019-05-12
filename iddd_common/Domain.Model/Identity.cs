@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace SaaSOvation.Common.Domain.Model
 {
-    using System;
-
     public abstract class Identity : IEquatable<Identity>, IIdentity
     {
         public Identity()
         {
-            this.Id = Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
         }
 
         public Identity(string id)
         {
-            this.Id = id;
+            Id = id;
+        }
+
+        public bool Equals(Identity id)
+        {
+            if (ReferenceEquals(this, id)) return true;
+            if (ReferenceEquals(null, id)) return false;
+            return Id.Equals(id.Id);
         }
 
         // currently for Entity Framework, set must be protected, not private.
         // will be fixed in EF 6.
         public string Id { get; protected set; }
-
-        public bool Equals(Identity id)
-        {
-            if (object.ReferenceEquals(this, id)) return true;
-            if (object.ReferenceEquals(null, id)) return false;
-            return this.Id.Equals(id.Id);
-        }
 
         public override bool Equals(object anotherObject)
         {
@@ -46,12 +46,12 @@ namespace SaaSOvation.Common.Domain.Model
 
         public override int GetHashCode()
         {
-            return (this.GetType().GetHashCode() * 907) + this.Id.GetHashCode();
+            return GetType().GetHashCode() * 907 + Id.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.GetType().Name + " [Id=" + Id + "]";
+            return GetType().Name + " [Id=" + Id + "]";
         }
     }
 }

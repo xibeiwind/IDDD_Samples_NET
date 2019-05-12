@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using SaaSOvation.Common.Domain.Model;
 
 namespace SaaSOvation.Common.Events
@@ -17,38 +13,25 @@ namespace SaaSOvation.Common.Events
             AssertionConcern.AssertArgumentNotEmpty(eventBody, "The event body is required.");
             AssertionConcern.AssertArgumentLength(eventBody, 65000, "The event body must be 65000 characters or less.");
 
-            this.typeName = typeName;
-            this.occurredOn = occurredOn;
-            this.eventBody = eventBody;
-            this.eventId = eventId;
+            TypeName = typeName;
+            OccurredOn = occurredOn;
+            EventBody = eventBody;
+            EventId = eventId;
         }
 
-        readonly string typeName;
+        public string TypeName { get; }
 
-        public string TypeName
+        public DateTime OccurredOn { get; }
+
+        public string EventBody { get; }
+
+        public long EventId { get; }
+
+        public bool Equals(StoredEvent other)
         {
-            get { return typeName; }
-        }
-
-        readonly DateTime occurredOn;
-
-        public DateTime OccurredOn
-        {
-            get { return occurredOn; }
-        }
-
-        readonly string eventBody;
-
-        public string EventBody
-        {
-            get { return eventBody; }
-        }
-
-        readonly long eventId;
-
-        public long EventId
-        {
-            get { return eventId; }
+            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) return false;
+            return EventId.Equals(other.EventId);
         }
 
         public IDomainEvent ToDomainEvent()
@@ -62,21 +45,15 @@ namespace SaaSOvation.Common.Events
             var eventType = default(Type);
             try
             {
-                eventType = Type.GetType(this.typeName);
+                eventType = Type.GetType(TypeName);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
                     string.Format("Class load error, because: {0}", ex));
             }
-            return (TEvent)EventSerializer.Instance.Deserialize(this.eventBody, eventType);
-        }
 
-        public bool Equals(StoredEvent other)
-        {
-            if (object.ReferenceEquals(this, other)) return true;
-            if (object.ReferenceEquals(null, other)) return false;
-            return this.eventId.Equals(other.eventId);
+            return (TEvent) EventSerializer.Instance.Deserialize(EventBody, eventType);
         }
 
         public override bool Equals(object obj)
@@ -86,7 +63,7 @@ namespace SaaSOvation.Common.Events
 
         public override int GetHashCode()
         {
-            return this.eventId.GetHashCode();
+            return EventId.GetHashCode();
         }
     }
 }

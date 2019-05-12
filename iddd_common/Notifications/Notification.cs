@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using SaaSOvation.Common.Domain.Model;
 
 namespace SaaSOvation.Common.Notifications
@@ -10,51 +7,35 @@ namespace SaaSOvation.Common.Notifications
     [Serializable]
     public class Notification : ValueObject
     {
+        private readonly IDomainEvent domainEvent;
+
         public Notification(long notificationId, IDomainEvent domainEvent)
         {
             AssertionConcern.AssertArgumentNotNull(domainEvent, "The event is required.");
 
-            this.notificationId = notificationId;
+            NotificationId = notificationId;
             this.domainEvent = domainEvent;
-            this.occurredOn = domainEvent.OccurredOn;
-            this.version = domainEvent.EventVersion;
-            this.typeName = domainEvent.GetType().FullName;
+            OccurredOn = domainEvent.OccurredOn;
+            Version = domainEvent.EventVersion;
+            TypeName = domainEvent.GetType().FullName;
         }
 
-        readonly long notificationId;
-        readonly IDomainEvent domainEvent;
-        readonly DateTime occurredOn;
-        readonly string typeName;
-        readonly int version;
+        public long NotificationId { get; }
+
+        public DateTime OccurredOn { get; }
+
+        public int Version { get; }
+
+        public string TypeName { get; }
 
         public TEvent GetEvent<TEvent>() where TEvent : IDomainEvent
         {
-            return (TEvent)this.domainEvent;
-        }
-
-        public long NotificationId
-        {
-            get { return this.notificationId; }
-        }
-
-        public DateTime OccurredOn
-        {
-            get { return this.occurredOn; }
-        }
-
-        public int Version
-        {
-            get { return this.version; }
-        }
-
-        public string TypeName
-        {
-            get { return this.typeName; }
+            return (TEvent) domainEvent;
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return this.notificationId;
+            yield return NotificationId;
         }
     }
 }
